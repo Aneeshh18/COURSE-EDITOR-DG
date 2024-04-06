@@ -4,6 +4,8 @@
 
 Welcome to the Course Management System! This application helps users manage courses, instructors, students, and associated details such as course name, instructor name, tags, and enrolled students. This README provides an overview of the functionality and components of the system.
 
+##VIDEO - https://github.com/Aneeshh18/COURSE-EDITOR-DG/assets/88325646/18ea9b3e-41e2-4e5d-828a-9da831471f7b
+
 ## Functionality
 
 ### Course List
