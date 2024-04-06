@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import useApi from "../hooks/useApi";
 import { Link } from "react-router-dom";
 import {
   Table,
@@ -11,6 +12,7 @@ import {
   Button,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import { API_ENDPOINTS } from "../utils/api";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -32,24 +34,20 @@ export interface Course {
 }
 
 const CourseList: React.FC = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
+  const {
+    data: courses,
+    loading,
+    error,
+  } = useApi<{ courses: Course[] }>(API_ENDPOINTS.COURSES);
 
-  useEffect(() => {
-    fetch(
-      "https://raw.githubusercontent.com/thedevelopers-co-in/dummy-api/main/course.json"
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        setCourses(data.courses);
-      })
-      .catch((error) => {
-        console.error("Error fetching courses:", error);
-      });
-  }, []);
-
-  if (courses === undefined) {
+  if (loading) {
     return <div>Loading...</div>;
   }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
   return (
     <div>
       <h1>Courses</h1>
@@ -66,33 +64,34 @@ const CourseList: React.FC = () => {
             </StyledTableRow>
           </TableHead>
           <TableBody>
-            {courses.map((course) => (
-              <StyledTableRow key={course.courseId}>
-                <TableCell>{course.courseId}</TableCell>
-                <TableCell>{course.instructorName}</TableCell>
-                <TableCell>{course.courseName}</TableCell>
-                <TableCell>{course.tags.join(", ")}</TableCell>
-                <TableCell>
-                  <ul>
-                    {course.students.map((student, index) => (
-                      <li key={index}>{student.name}</li>
-                    ))}
-                  </ul>
-                </TableCell>
-                <TableCell>
-                  <Link
-                    to={{
-                      pathname: `/course/${course.courseId}/${course.courseName}/${course.instructorName}`,
-                      state: { courseData: course },
-                    }}
-                  >
-                    <Button variant="contained" color="primary">
-                      View Details
-                    </Button>
-                  </Link>
-                </TableCell>
-              </StyledTableRow>
-            ))}
+            {courses &&
+              courses.courses.map((course) => (
+                <StyledTableRow key={course.courseId}>
+                  <TableCell>{course.courseId}</TableCell>
+                  <TableCell>{course.instructorName}</TableCell>
+                  <TableCell>{course.courseName}</TableCell>
+                  <TableCell>{course.tags.join(", ")}</TableCell>
+                  <TableCell>
+                    <ul>
+                      {course.students.map((student, index) => (
+                        <li key={index}>{student.name}</li>
+                      ))}
+                    </ul>
+                  </TableCell>
+                  <TableCell>
+                    <Link
+                      to={{
+                        pathname: `/course/${course.courseId}/${course.courseName}/${course.instructorName}`,
+                        state: { courseData: course },
+                      }}
+                    >
+                      <Button variant="contained" color="primary">
+                        View Details
+                      </Button>
+                    </Link>
+                  </TableCell>
+                </StyledTableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
